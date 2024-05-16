@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect("mongodb://localhost:27017/vinted");
+mongoose.connect(process.env.MONGODB_URI);
 // //////////////////////////// CONFIG CLOUDINARY /////////////////////////////////
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
