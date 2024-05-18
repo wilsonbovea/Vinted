@@ -5,7 +5,7 @@ const isAuthenticated = require("../middlewares/isAuthenticated");
 const router = express.Router();
 const Offer = require("../models/offer");
 const User = require("../models/user");
-
+// ///////////////////////////// //////////////////////////////////////
 const convertToBase64 = (file) => {
   return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
 };
