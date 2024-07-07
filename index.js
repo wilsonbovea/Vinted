@@ -16,7 +16,7 @@ cloudinary.config({
 });
 app.get("/", (req, res) => {
   try {
-    res.status(200).json("Welcome to Sign-Up");
+    res.status(200).json("Welcome to Vinted Back-end");
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
