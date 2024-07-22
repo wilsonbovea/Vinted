@@ -39,6 +39,7 @@ router.post(
             return res.status(400).json({ message: "You must send images" });
           }
           try {
+            console.log("try posible error");
             const result = await cloudinary.uploader.upload(
               convertToBase64(req.files.picture),
               {
