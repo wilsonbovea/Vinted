@@ -16,32 +16,74 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      const pictureToUpload = req.files.picture;
-
-      const result = await cloudinary.uploader.upload(
-        convertToBase64(pictureToUpload)
-      );
-
       const { title, description, price, condition, city, brand, size, color } =
         req.body;
+      if (title && price && req.files?.picture) {
+        const newOffer = new Offer({
+          product_name: title,
+          product_description: description,
+          product_price: price,
+          product_details: [
+            { MARQUE: brand },
+            { TAILLE: size },
+            { ÉTAT: condition },
+            { COULEUR: color },
+            { EMPLACEMENT: city },
+          ],
 
-      const newOffer = new Offer({
-        product_name: title,
-        product_description: description,
-        product_price: price,
-        product_details: [
-          { MARQUE: brand },
-          { TAILLE: size },
-          { ETAT: condition },
-          { COULEUR: color },
-          { EMPLACEMENT: city },
-        ],
-        product_image: result,
-        owner: req.user,
-      });
-      newOffer.owner = { account: req.user.account };
-      await newOffer.save();
-      res.status(200).json(newOffer);
+          owner: req.user,
+        });
+
+        if (!Array.isArray(req.files.picture)) {
+          if (req.files.picture.mimetype.slice(0, 5) !== "image") {
+            return res.status(400).json({ message: "You must send images" });
+          }
+
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.picture),
+            {
+              folder: `api/vinted/offers/${newOffer._id}`,
+
+              public_id: "preview",
+            }
+          );
+
+          newOffer.product_image = result;
+
+          newOffer.product_pictures.push(result);
+        } else {
+          for (let i = 0; i < req.files.picture.length; i++) {
+            const picture = req.files.picture[i];
+
+            if (picture.mimetype.slice(0, 5) !== "image") {
+              return res.status(400).json({ message: "You must send images" });
+            }
+            if (i === 0) {
+              const result = await cloudinary.uploader.upload(
+                convertToBase64(picture),
+                {
+                  folder: `api/vinted/offers/${newOffer._id}`,
+                  public_id: "preview",
+                }
+              );
+
+              newOffer.product_image = result;
+              newOffer.product_pictures.push(result);
+            } else {
+              const result = await cloudinary.uploader.upload(
+                convertToBase64(picture),
+                {
+                  folder: `api/vinted/offers/${newOffer._id}`,
+                }
+              );
+              newOffer.product_pictures.push(result);
+            }
+          }
+        }
+        // newOffer.owner = { account: req.user.account };
+        await newOffer.save();
+        res.status(200).json(newOffer);
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -51,7 +93,7 @@ router.post(
 router.get("/offers/", async (req, res) => {
   try {
     const filters = {};
-    const limit = 2;
+    const limit = 20;
     const skip = (req.query.page - 1) * limit;
 
     if (req.query.title) {

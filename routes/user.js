@@ -21,13 +21,23 @@ router.post("/user/signup", async (req, res) => {
           email: req.body.email,
           account: {
             username: req.body.username,
-            avatar: Object, // nous verrons plus tard comment uploader une image
+            // avatar: Object, // nous verrons plus tard comment uploader une image
           },
           newsletter: req.body.newsletter,
           token: token,
           hash: readableHash,
           salt: salt,
         });
+        if (req.files?.avatar) {
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.avatar),
+            {
+              folder: `api/vinted/users/${newUser._id}`,
+              public_id: "avatar",
+            }
+          );
+          newUser.account.avatar = result;
+        }
 
         await newUser.save();
 
@@ -41,6 +51,7 @@ router.post("/user/signup", async (req, res) => {
       res.status(500).json({ message: "Missing parameters" });
     }
   } catch (error) {
+    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 });
