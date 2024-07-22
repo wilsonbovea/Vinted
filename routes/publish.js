@@ -38,19 +38,22 @@ router.post(
           if (req.files.picture.mimetype.slice(0, 5) !== "image") {
             return res.status(400).json({ message: "You must send images" });
           }
+          try {
+            const result = await cloudinary.uploader.upload(
+              convertToBase64(req.files.picture),
+              {
+                folder: `api/vinted/offers/${newOffer._id}`,
 
-          const result = await cloudinary.uploader.upload(
-            convertToBase64(req.files.picture),
-            {
-              folder: `api/vinted/offers/${newOffer._id}`,
+                public_id: "preview",
+              }
+            );
 
-              public_id: "preview",
-            }
-          );
+            newOffer.product_image = result;
 
-          newOffer.product_image = result;
-
-          newOffer.product_pictures.push(result);
+            newOffer.product_pictures.push(result);
+          } catch (error) {
+            console.log("aqui fue hp", error.message);
+          }
         } else {
           for (let i = 0; i < req.files.picture.length; i++) {
             const picture = req.files.picture[i];
