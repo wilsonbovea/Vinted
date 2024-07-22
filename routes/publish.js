@@ -37,23 +37,18 @@ router.post(
           if (req.files.picture.mimetype.slice(0, 5) !== "image") {
             return res.status(400).json({ message: "You must send images" });
           }
-          try {
-            console.log("try posible error");
-            const result = await cloudinary.uploader.upload(
-              convertToBase64(req.files.picture),
-              {
-                folder: `api/vinted/offers/${newOffer._id}`,
+          const result = await cloudinary.uploader.upload(
+            convertToBase64(req.files.picture),
+            {
+              folder: `api/vinted/offers/${newOffer._id}`,
 
-                public_id: "preview",
-              }
-            );
+              public_id: "preview",
+            }
+          );
 
-            newOffer.product_image = result;
+          newOffer.product_image = result;
 
-            newOffer.product_pictures.push(result);
-          } catch (error) {
-            console.log("aqui fue hp", error.message);
-          }
+          newOffer.product_pictures.push(result);
         } else {
           for (let i = 0; i < req.files.picture.length; i++) {
             const picture = req.files.picture[i];
@@ -170,9 +165,12 @@ router.get("/offers/", async (req, res) => {
   }
 });
 // ///////////////////////////// OFFERS ID //////////////////////////////////////
-router.get("/offers/:id", async (req, res) => {
+router.get("/offer/:id", async (req, res) => {
   try {
-    const offerById = await Offer.findById(req.params.id).populate("owner");
+    const offerById = await Offer.findById(req.params.id).populate({
+      path: "owner",
+      select: "account.username account.phone account.avatar",
+    });
     res.status(200).json(offerById);
   } catch (error) {
     res.status(500).json({ message: error.message });
