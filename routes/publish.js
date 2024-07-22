@@ -84,7 +84,7 @@ router.post(
             }
           }
         }
-        // newOffer.owner = { account: req.user.account };
+        newOffer.owner = { account: req.user.account };
         await newOffer.save();
         res.status(200).json(newOffer);
       }
