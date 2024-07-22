@@ -30,7 +30,7 @@ router.post(
             { COULEUR: color },
             { EMPLACEMENT: city },
           ],
-
+          product_pictures: [],
           owner: req.user,
         });
 
