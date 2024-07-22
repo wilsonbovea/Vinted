@@ -21,7 +21,7 @@ router.post("/user/signup", async (req, res) => {
           email: req.body.email,
           account: {
             username: req.body.username,
-            // avatar: Object, // nous verrons plus tard comment uploader une image
+            avatar: Object, // nous verrons plus tard comment uploader une image
           },
           newsletter: req.body.newsletter,
           token: token,
