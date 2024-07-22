@@ -32,6 +32,6 @@ app.use(routePublish);
 app.all("*", (req, res) => {
   res.status(404).json({ message: "Route non found" });
 });
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 3000, () => {
   console.log("SERVER STARTED 🚀");
 });

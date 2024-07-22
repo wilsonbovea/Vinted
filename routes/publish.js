@@ -30,7 +30,6 @@ router.post(
             { COULEUR: color },
             { EMPLACEMENT: city },
           ],
-          product_pictures: [],
           owner: req.user,
         });
 
@@ -84,7 +83,7 @@ router.post(
             }
           }
         }
-        newOffer.owner = { account: req.user.account };
+        // newOffer.owner = { account: req.user.account };
         await newOffer.save();
         res.status(200).json(newOffer);
       }
@@ -121,23 +120,50 @@ router.get("/offers/", async (req, res) => {
     if (req.query.sort && req.query.page) {
       const sort = req.query.sort.replace("price-", "");
       const offers = await Offer.find(filters)
+        .populate({
+          path: "owner",
+          select: "account",
+        })
         .sort({ product_price: sort })
         .limit(limit)
         .skip(skip);
+      const count = await Offer.countDocuments(filters);
 
-      return res.status(200).json(offers);
+      res.status(200).json({
+        count: count,
+        offers: offers,
+      });
     } else if (req.query.sort) {
       const sort = req.query.sort.replace("price-", "");
       const offers = await Offer.find(filters)
+        .populate({
+          path: "owner",
+          select: "account",
+        })
         .sort({ product_price: sort })
         .limit(limit)
         .skip(skip);
+      const count = await Offer.countDocuments(filters);
 
-      return res.status(200).json(offers);
+      res.status(200).json({
+        count: count,
+        offers: offers,
+      });
     } else {
-      const offers = await Offer.find(filters).limit(limit).skip(skip);
+      const offers = await Offer.find(filters)
+        .populate({
+          path: "owner",
+          select: "account",
+        })
+        .limit(limit)
+        .skip(skip);
 
-      return res.status(200).json(offers);
+      const count = await Offer.countDocuments(filters);
+
+      res.json({
+        count: count,
+        offers: offers,
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

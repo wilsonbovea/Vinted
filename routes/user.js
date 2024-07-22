@@ -19,14 +19,14 @@ router.post("/user/signup", async (req, res) => {
         const readableHash = hash.toString(encBase64);
         const newUser = new User({
           email: req.body.email,
+          token: token,
+          hash: readableHash,
+          salt: salt,
           account: {
             username: req.body.username,
             // avatar: Object, // nous verrons plus tard comment uploader une image
           },
           newsletter: req.body.newsletter,
-          token: token,
-          hash: readableHash,
-          salt: salt,
         });
         if (req.files?.avatar) {
           const result = await cloudinary.uploader.upload(
@@ -41,11 +41,17 @@ router.post("/user/signup", async (req, res) => {
 
         await newUser.save();
 
-        const newObjUser = {};
-        newObjUser._id = newUser._id;
-        newObjUser.token = newUser.token;
-        newObjUser.account = newUser.account;
-        res.status(201).json(newObjUser);
+        // const newObjUser = {};
+        // newObjUser._id = newUser._id;
+        // newObjUser.token = newUser.token;
+        // newObjUser.account = newUser.account;
+        // res.status(201).json(newObjUser);
+        res.status(201).json({
+          _id: newUser._id,
+          email: newUser.email,
+          token: newUser.token,
+          account: newUser.account,
+        });
       }
     } else {
       res.status(500).json({ message: "Missing parameters" });
@@ -64,12 +70,17 @@ router.post("/user/login", async (req, res) => {
     );
     if (userDoc) {
       if (hashConfirmation === userDoc.hash) {
-        const newObjUser = {};
-        newObjUser._id = userDoc._id;
-        newObjUser.token = userDoc.token;
-        newObjUser.account = userDoc.account;
+        // const newObjUser = {};
+        // newObjUser._id = userDoc._id;
+        // newObjUser.token = userDoc.token;
+        // newObjUser.account = userDoc.account;
 
-        res.status(200).json(newObjUser);
+        // res.status(200).json(newObjUser);
+        res.status(200).json({
+          _id: userDoc._id,
+          token: userDoc.token,
+          account: userDoc.account,
+        });
       } else {
         res.status(401).json("Email or Password was not correct");
       }
