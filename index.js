@@ -25,8 +25,8 @@ app.get("/", (req, res) => {
 const routeUser = require("./routes/user");
 app.use(routeUser);
 // //////////////////////////// PUBLISH /////////////////////////////////
-const routePublish = require("./routes/publish");
-app.use(routePublish);
+const routeOffers = require("./routes/offers");
+app.use(routeOffers);
 
 // //////////////////////////// /////////////////////////////////
 app.all("*", (req, res) => {

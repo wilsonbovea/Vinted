@@ -177,4 +177,3 @@ router.get("/offer/:id", async (req, res) => {
   }
 });
 module.exports = router;
-// https://upload-request.cloudinary.com/dxrlvaybw/64133149b667e82144b980b14c7d5521
