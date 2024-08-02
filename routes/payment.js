@@ -5,11 +5,8 @@ const stripe = require("stripe")(process.env.KEY_STRIPE);
 
 router.post("/payment", async (req, res) => {
   try {
-    const amount = req.body.amount * 100;
-    const amountFixed = amount.toFixed(0);
-
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: amountFixed,
+      amount: req.body.amount,
 
       currency: "eur",
 
